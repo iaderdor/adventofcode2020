@@ -1,0 +1,110 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+APP_PATH = File.expand_path(
+  File.join(
+    File.dirname(
+      File.expand_path($PROGRAM_NAME)
+    ), '..'
+  )
+)
+
+def header_text
+  puts 'aoc - Tool for advent of code exercise management (Version 0.0.1)'
+end
+
+def usage_text
+  puts 'aoc [-e n [-d]] [-h]'
+end
+
+def help_text
+  puts <<~ENDOFHELP
+    -h, --help:
+      show this help
+    -l, --list:
+      list exercises available to execute
+    -e n, --execute n:
+      execute advent of code exercise number n
+    -d, --debug:
+      load byebug in order to debug the code
+  ENDOFHELP
+end
+
+def execute_exercise(exercise_number)
+  regex = /^\d+$/
+  unless exercise_number.match(regex)
+    puts 'Tried to execute an exercise,' \
+         " but an unvalid excercise number (#{exercise_number}) was provided"
+    exit 1
+  end
+
+  exercise_path = File.join(APP_PATH, 'src', exercise_number)
+
+  begin
+    load File.join(exercise_path, 'main.rb')
+  rescue LoadError
+    puts "Tried to execute exercise #{exercise_number}, but no file was found"
+    puts "Does the file #{exercise_path}/main.rb exists?"
+    exit 1
+  end
+
+  puts "Executing exercise #{exercise_number}"
+  begin
+    main
+  rescue Exception => e
+    puts 'An exception occured:'
+    puts e
+  end
+end
+
+def list_exercises
+  exercise_folders = Dir.entries File.join(APP_PATH, 'src')
+  exercise_folders.delete '.'
+  exercise_folders.delete '..'
+
+  output = ''
+  col_width = 5
+  cols = 5
+
+  exercise_folders.each do |exercise|
+    # byebug
+    zeroes = col_width - exercise.length
+    output += ' ' * zeroes + exercise
+    output += '\n' if (output.tr('\n', '').length % (col_width * cols)).zero?
+  end
+  puts output
+end
+
+args = {}
+
+ARGV.each_with_index do |arg, idx|
+  case arg
+  when '-h', '--help'
+    args[:help] = true
+  when '-d', '--debug'
+    args[:debug] = true
+  when '-e', '--execute'
+    args[:execute] = true
+    args[:exercise_number] = ARGV[idx + 1]
+  when '-l', '--list'
+    args[:list] = true
+  end
+end
+
+require 'byebug' if args[:debug]
+
+if args[:help] || args.empty?
+  usage_text
+  help_text
+  exit
+end
+
+if args[:execute]
+  execute_exercise(args[:exercise_number])
+  exit
+end
+
+if args[:list]
+  list_exercises
+  exit
+end
