@@ -41,5 +41,6 @@ bin/aoc --list
 
 ## Exercises
 
-To be done!
+This is a list of the exercises that I've finished
 
+ - [1](https://adventofcode.com/2020/day/1)
