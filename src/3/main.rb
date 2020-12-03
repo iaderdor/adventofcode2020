@@ -28,12 +28,11 @@ end
 def count_trees_colision(lines, right_slope, down_slope)
   count = 0
   line_length = lines[0].length
+  rows = lines.length
   column = 0
 
-  lines.each_with_index do |line, index|
-    next if index % down_slope != 0
-
-    count += 1 if line[column] == '#'
+  (0..rows - 1).step(down_slope).to_a.each do |line_number|
+    count += 1 if lines[line_number][column] == '#'
     column = (column + right_slope) % line_length
   end
 
