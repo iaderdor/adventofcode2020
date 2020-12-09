@@ -68,9 +68,25 @@ def create_exercise(exercise_number)
 
   File.open(path_to_file, 'w') do |f|
     f << <<~DOC
-      def main
+      require_relative '../../lib/aoc'
 
+      def main
+        puts "Test result: \#{handler 'test.txt', 1}"
+        #puts "Result: \#{handler 'input.txt', 1}"
+
+        #puts "Test result2: \#{handler 'test.txt', 2}"
+        #puts "Result: \#{handler 'input.txt', 2}"
       end
+
+      def handler(file, exercise_number)
+        lines = Aoc.parse_file file
+        case exercise_number
+        when 1
+        when 2
+        end
+      end
+
+      main if __FILE__ == $PROGRAM_NAME
     DOC
   end
 
@@ -88,7 +104,6 @@ def list_exercises
   cols = 5
 
   exercise_folders.each do |exercise|
-    # byebug
     zeroes = col_width - exercise.length
     output += ' ' * zeroes + exercise
     output += '\n' if (output.tr('\n', '').length % (col_width * cols)).zero?
